@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+</head>
+<body>
+    <h1>Shopping Cart</h1>
+
+    <div class="cart-items">
+        {{#each cart.products}}
+        <div class="cart-item">
+            <h2>{{this.product.title}}</h2>
+            <p>Quantity: {{this.quantity}}</p>
+        </div>
+        {{/each}}
+    </div>
+
+    <form action="/api/carts/{{cart._id}}" method="POST">
+        <button type="submit">Clear Cart</button>
+    </form>
+</body>
+</html>
