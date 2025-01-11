@@ -76,3 +76,43 @@ module.exports = {
         }
     }
 };
+
+
+const Product = require('../models/Product');
+const User = require('../models/User');
+const nodemailer = require('nodemailer');
+
+module.exports = {
+  async deleteProduct(req, res) {
+    const { id } = req.params;
+    try {
+      const product = await Product.findById(id);
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+
+      const user = await User.findById(product.userId);
+      if (user.role === 'premium') {
+        // Enviar e-mail ao usuário premium
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD,
+          }
+        });
+
+        transporter.sendMail({
+          to: user.email,
+          subject: 'Produto excluído',
+          text: `O produto ${product.name} foi excluído.`
+        });
+      }
+
+      await Product.findByIdAndDelete(id);
+      res.status(200).json({ message: 'Product deleted' });
+    } catch (error) {
+      res.status(500).json({ error: 'Error deleting product' });
+    }
+  }
+};
